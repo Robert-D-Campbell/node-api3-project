@@ -39,7 +39,7 @@ router.post("/:id/posts", validateUserId, validatePost, (req, res) => {
     });
 });
 
-router.get("/", validateUser, (req, res) => {
+router.get("/", (req, res) => {
   // do your magic!
   Users.get(req.query)
     .then(users => {
@@ -69,11 +69,6 @@ router.get("/:id", validateUserId, (req, res) => {
 router.get("/:id/posts", validateUserId, (req, res) => {
   // do your magic!
   const id = req.params.id;
-  if (!id) {
-    res.status(404).json({
-      message: "The posts with the specified  user ID does not exist."
-    });
-  }
   Users.getUserPosts(id)
     .then(posts => {
       res.status(200).json(posts);
@@ -86,22 +81,16 @@ router.get("/:id/posts", validateUserId, (req, res) => {
 
 router.delete("/:id", validateUserId, (req, res) => {
   id = req.params.id;
-  if (!id) {
-    res.status(404).json({
-      message: "The posts with the specified  user ID does not exist."
+  Users.remove(id)
+    .then(removed => {
+      res
+        .status(200)
+        .json({ message: "The user has been sacrificed to the API GODS!" });
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({ errorMessage: "error geting users posts" });
     });
-  } else {
-    Users.remove(id)
-      .then(removed => {
-        res
-          .status(200)
-          .json({ message: "The user has been sacrificed to the API GODS!" });
-      })
-      .catch(error => {
-        console.log(error);
-        res.status(500).json({ errorMessage: "error geting users posts" });
-      });
-  }
 });
 
 router.put("/:id", validateUser, (req, res) => {
